@@ -51,6 +51,7 @@ question("Which of the following statements is true?",
 )
 ```
 
+
 Note that in some books response variables will be called 'dependent', whilst
 explanatory variables will be called 'independent', so it is useful to be aware
 of both sets of terms.
@@ -87,9 +88,9 @@ object simply type its name. To display the first few lines, use `head()`.
 </div>
 
 Now produce a scatterplot of the caterpiller growth rate (y-axis) against the
-amount of tannins in the diet (x-axis). You can use either the `plot()` function
-or the `gf_point()` function. The `gf_` or "graph formula" functions are more
-flexible than base graphics, but either can be used here.
+amount of tannins in the diet (x-axis). Use `gf_point()` function to display
+your data as points in an x-y scatterplot. The `gf_` or "graph formula" functions
+are more flexible than base graphics, and tend to follow a "formula" syntax.
 
 ```{r scatter_plot, exercise=TRUE, exercise.completion=FALSE}
 
@@ -203,7 +204,7 @@ the three asterisks after the numbers.  **Important** When p-values are very low
 less than 0.001, it is best to report them as *p < 0.001* rather than write out
 the full set of decimal places.
 
-```{r understanding_summary, echo=FALSE, allow_retry=TRUE}
+```{r understanding_summary, echo=FALSE}
 question("Which of these statements is true?",
          answer("The estimate for Intercept is the value on the y-axis when the x-axis is zero", correct=TRUE),
          answer("The p-value is the probability that the parameter is zero",
@@ -211,7 +212,8 @@ question("Which of these statements is true?",
          answer("The intercept will always be significant", message = "Sometimes the intercept might be
                 non-significant, so that the fitted line goes through the zero on the x and y axes. You can
                 omit the intercept by fitting the model as `lm(response ~ 1 - explanatory)`"),
-         answer("A p-value shown as 2.34e-05 is the same as 0.0000234", correct=TRUE)
+         answer("A p-value shown as 2.34e-05 is the same as 0.0000234", correct=TRUE),
+         allow_retry = TRUE
 )
 ```
 
@@ -308,7 +310,132 @@ caterpiller_lm <- lm(growth ~ tannin, data=caterpillers)
 ```
 
 ## Checking model assumptions
-Still to add. QQ plots, residuals etc.
+### Model assumptions
+One of the key assumptions about all linear models is that the **residuals** are
+from a **normal** distribution. So what do we mean by *residuals*? Look at the
+graph of your points and the fitted line from the model:
+
+```{r fitted_line_and_data, echo=FALSE}
+caterpiller_lm <- lm(growth ~ tannin, data=caterpillers)
+gf_point(growth ~ tannin, data=caterpillers) %>% 
+  gf_lm()
+```
+
+Not all your observations fall exactly on the line, as sometimes they are slightly
+above, and sometimes below. Even if you do an amazingly good experiment, it is
+very unlikely that they will all fall exactly on the line. You will always have
+residuals.
+
+```{r residuals_basics, echo=FALSE}
+question("Which of the following statements is true?",
+         answer("Residuals are also known as errors or noise",
+                correct = TRUE, message = "Residuals, noise and errors are all valid terms"),
+         answer("If you increase the replication the residuals will disappear",
+                message = "You will still have unexplained variation even with more replicates"),
+         answer("You need to do the experiment again",
+                message = "Not necessarily; the biological system might be naturally noisy"),
+         answer("Check residuals in case any outliers were due to experimental error",
+                correct=TRUE),
+         answer("Sometimes including extra explanatory variables will reduce the residuals",
+                correct=TRUE),
+         allow_retry = TRUE
+)
+```
+
+
+You wrote your model as
+
+`lm(growth ~ tannin, data=caterpillers)`
+
+which is the equivalent of
+
+$$Response = Explanatory\space variable(s)$$
+However the above equation is actually incomplete. In full the equation is:
+
+
+$$Response = Explanatory\space variable(s) + Error$$
+where $Error$ represents your residuals. You might also see it represented as:
+
+$$Y = X + \epsilon$$
+where the $Y$ is the response, $X$ is one (or more) explanatory variable(s), and
+the Greek letter epsilon $\epsilon$ represents the residual error.
+
+### Looking at your residuals
+It is easy to view the residuals from your model using the `residuals()` function; 
+try it here to look at the numbers from your `caterpiller_lm` linear model. Try
+it out now:
+
+```{r lm_residuals, exercise=TRUE, exercise.completion=FALSE}
+caterpiller_lm <- lm(growth ~ tannin, data=caterpillers)
+
+```
+<div id=lm_residuals-hint>
+Simply use the `residuals()` function with your model output `caterpiller_lm` as
+its parameter to display the positive and negative residual values.
+</div>
+
+If you had a big experiment, with e.g. 30 individual observations, you could use
+the `gf_histogram()` function to display a frequency histogram of your residuals,
+and check that they look approximately normal (bell-shaped curve). However, your
+experiment only has 9 observations, so it is difficult to assess this histogram:
+
+```{r histogram_residuals}
+caterpiller_lm <- lm(growth ~ tannin, data=caterpillers)
+gf_histogram(~ residuals(caterpiller_lm)) %>% 
+  gf_dens()
+```
+
+There are so few points, that the bars of the histogram do not show any obvious
+pattern, although adding a smoothed density curve via `gf_dens()` implies that
+we have a bell-shaped curve. However we need a more sophisticated method of
+checking our residuals.
+
+### QQ plots
+Quantile-quantile plots (QQ plots) are a very simple way of checking your model
+residuals, and are useful, as here, when we have small datasets. So what is a
+quantile? Imagine a typical bell-shaped curve, from a normal distribution. Let
+us create a set of random data from a normal distribution, with a mean of zero,
+and display its frequency histogram:
+
+```{r normal_random}
+my_data <- rnorm(200) # Creates 50 data points from a random distribution
+mean(my_data)        # Check the average is zero
+gf_histogram(~ my_data) 
+```
+
+You can see that it is centred around zero, and roughly bell-shaped. All a QQ
+plot does is sort your residual data from lowest to highest, and sees how well
+it matches with what you would expect in theory. Let's look at this with some
+more randomly generated data, against a dotted line showing what values would
+have been obtained if there was a perfect match:
+
+```{r normal_random_with_qqplot}
+my_data <- rnorm(200) # Creates 50 data points from a random distribution
+gf_qq(~ my_data)  %>% # Your 50 data points
+  gf_qqline()
+```
+
+The match between the random data (points) and that expected in theory (dots) is
+of course excellent. But what about your data from your caterpillers when you
+only have 9 data points? Try it now:
+
+```{r caterpiller_qqplot, exercise=TRUE, exercise.completion=FALSE}
+caterpiller_lm <- lm(growth ~ tannin, data=caterpillers)
+
+```
+```{r caterpiller_qqplot-solution}
+# Store the residuals in a new variable called model_error, then use the
+# gf_qq() and gf_qqline() functions to display the QQ plots
+model_error <- residuals(caterpiller_lm)
+gf_qq( ~ model_error) %>% 
+  gf_qqline()
+```
+
+As you can see, your QQ plot points match very closely to the theoretical ideal
+of a straight line suggesting that your linear model is robust.
+
+
+
 
 ## How to report your results
 
@@ -327,4 +454,6 @@ P < 0.001)
 * The results were significant with P=5.94e-06. **Note** For low P-values report P < 0.001
 * The results were significant with P<0.001. **Note** you should report the F- or t-statistic
 * Overall linear model was significant (F=30.97, P<0.001). **This is a subtle error. Ideally
-you should give the *degrees of freedom (see other tutorial)* as well as the F-statistic.
+you should give the *degrees of freedom (see other tutorial)* as well as the F-statistic. See
+the second bullet point above where you can see F<sub>1,7</sub> indicating 1 and 7 degrees
+of freedom.
