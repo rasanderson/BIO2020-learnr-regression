@@ -2,7 +2,5 @@
 .Rhistory
 .RData
 .Ruserdata
-learnr_regression/learnr_regression_cache
-learnr_regression/learnr_regression_files
-learnr_regression/rsconnect
-learnr_regression/*.html
+rsconnect
+learnr_regression.html
