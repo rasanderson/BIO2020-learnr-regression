@@ -45,8 +45,8 @@ continue, answer the following question:
 
 ```{r which_is_response, echo=FALSE}
 question("Which of the following statements is true?",
-         answer("growth rate is the independent variable and tannin is dependent", correct = TRUE),
-         answer("the response is the growth rate and tannin is explanatory"),
+         answer("growth rate is the independent variable and tannin is dependent"),
+         answer("the response is the growth rate and tannin is explanatory", correct = TRUE),
          answer("either variable could be treated as response or explanatory")
 )
 ```
