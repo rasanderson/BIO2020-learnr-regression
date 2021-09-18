@@ -163,30 +163,27 @@ table is important and has 5 columns:
 |(Intercept)  |11.7556 |     1.0408|  11.295| 9.54e-06 ***|
 |tannin       |-1.2167 |   0.2186  |-5.565  |0.000846 ***|
 
-The first column gives the names of the parameters estimated by your linear
-model. Here it is two parameters:
+### first column (no heading title)
+Gives the names of the parameters estimated by your linear model. Here it is two parameters:
 
-*(Intercept): This is where your fitted line intersects the y-axis when x is zero
-*tannin: This is the gradient of your fitted line. The rate of change in growth
+* (Intercept): This is where your fitted line intersects the y-axis when x is zero
+* tannin: This is the gradient of your fitted line. The rate of change in growth
 rate with tannin.
 
-The second column, headed `Estimate` gives the values calculated by the linear
-model for your two parameters:
+### second column (headed `Estimate`)
+Gives the values calculated by the linear model for your two parameters:
 
 * `r round(caterpiller_lm$coefficients[1],2)` for the intercept
-* `r round(caterpiller_lm$coefficients[2],2)` for the gradient. This is negative as growth rate is low with high tannin
+* `r round(caterpiller_lm$coefficients[2],2)` for the gradient. This is **negative** as growth rate is low with high tannin, i.e. the line goes down from left to right.
 
-The third column `Std. Error` provides the standard errors for your estimates. 
+### third column (headed `Std. Error`)
+Provides the standard errors for your estimates. 
 
-The fourth column `t value` gives the estimated statistic from the **t distribution**
+### fourth column `t value` gives the estimated statistic from the **t distribution**
 which is a statistical distribution (developed to improve the brewing of Guiness stout!).
 
-The fifth and final column, headed `Pr(>|t|)` indicates how likely you are to have
-obtained these values from a t distribution according to the null hypothesis. That's
-very confusing, a simpler interpretation is "what is the probability of obtaining
-these estimated intercepts and gradient if there was no relationship between 
-caterpiller growth rate and tannin". Basically, the **lower** these **p-values**
-the **more important** the gradient and intercept.
+### Fifth and final column, headed `Pr(>|t|)`
+This indicates "how likely you are to have obtained these values from a t-distribution according to the null hypothesis". That's very confusing! A simpler interpretation is "what is the probability of obtaining the estimated intercept and gradient if there was no relationship between caterpiller growth rate and tannin". Basically, the **lower** these **p-values** the **more important** the gradient and intercept.
 
 If the p-values are very low, the way R displays them is confusing. You can see:
 
